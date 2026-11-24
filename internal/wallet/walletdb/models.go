@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gitub.com/google/uuid"
 )
 
 type EntryDirection string

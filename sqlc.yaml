@@ -17,7 +17,7 @@ sql:
           - db_type: uuid
             nullable: true
             go_type:
-              import: gitub.com/google/uuid
+              import: github.com/google/uuid
               type: UUID
               pointer: true
           - db_type: timestamptz

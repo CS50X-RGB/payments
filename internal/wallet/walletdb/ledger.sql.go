@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"gitub.com/google/uuid"
 )
 
 const createEntry = `-- name: CreateEntry :one
