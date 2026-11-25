@@ -9,10 +9,25 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/CS50X-RGB/payments/internal/postgres"
 )
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	dsn := os.Getenv("WALLET_DATABASE_URL")
+
+	if dsn == "" {
+		dsn = "postgres://payments:payments@localhost:5432/wallet?sslmode=disable"
+	}
+
+	pool, err := postgres.NewPool(context.Background(), dsn)
+	if err != nil {
+		logger.Error("connect in postgres")
+		os.Exit(1)
+	}
+	logger.Info("connected to postgres", "max_connx", pool.Config().MaxConns)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
