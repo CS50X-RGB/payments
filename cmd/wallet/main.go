@@ -36,6 +36,18 @@ func main() {
 		w.Write([]byte(`{"status": "ok"}` + "\n"))
 	})
 
+	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		w.Header().Set("Content-Type", "application/json")
+		if err := pool.Ping(ctx); err != nil {
+			logger.Warn("not ready: database unreachable", "err", err)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte(`{"status" : "unavailable"}` + "\n"))
+			return
+		}
+		w.Write([]byte(`{"status" : "ready"}` + "\n"))
+	})
 	srv := &http.Server{
 		Addr:              ":8081",
 		Handler:           mux,
@@ -64,4 +76,8 @@ func main() {
 	}
 
 	logger.Info("Server Stopped")
+
+	// Close the pool last : requests that were still finishing needed it
+	pool.Close()
+	logger.Info("database pool closed")
 }
