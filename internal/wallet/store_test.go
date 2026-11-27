@@ -16,9 +16,9 @@ func newStore(t *testing.T) *wallet.Store {
 	t.Helper()
 	dsn := os.Getenv("WALLET_TEST_DATABASE_URL")
 	if dsn == "" {
-		t.Skip("WALLET_TEST_DATABASE_URL not set,skipping integration test")
+		t.Skip("WALLET_TEST_DATABASE_URL not set, skipping integration test")
 	}
-	pool, err := postgres.NewPool(t.Context(), dsn)
+	pool, err := postgres.NewPool(t.Context(), dsn, 4)
 	if err != nil {
 		t.Fatalf("connect: %v", err)
 	}
@@ -63,13 +63,13 @@ func TestPostTransaction(t *testing.T) {
 			{
 				AccountID: bank,
 				Direction: wallet.Debit,
-				Amount:    50000,
+				Amount:    5000,
 				Cuurency:  "USD",
 			},
 			{
 				AccountID: alice,
 				Direction: wallet.Credit,
-				Amount:    50000,
+				Amount:    5000,
 				Cuurency:  "USD",
 			},
 		},
@@ -141,11 +141,9 @@ func TestPostTransactionRejectedUnbalanced(t *testing.T) {
 
 func TestAccountNotFound(t *testing.T) {
 	t.Parallel()
-	//	s := newStore(t)
-
-	//	_, err := s.Account(t.Context(), uuid.New())
-
-	//	if !errors.Is(err, wallet.ErrAccountNotFound) {
-	//		t.Fatalf("got error %v want ErrAccountNotFound", err)
-	//	}
+	s := newStore(t)
+	_, err := s.Account(t.Context(), uuid.New())
+	if !errors.Is(err, wallet.ErrAccountNotFound) {
+		t.Fatalf("got error %v, want ErrAccountNotFound", err)
+	}
 }

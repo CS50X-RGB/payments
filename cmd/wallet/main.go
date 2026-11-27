@@ -22,7 +22,7 @@ func main() {
 		dsn = "postgres://payments:payments@localhost:5432/wallet?sslmode=disable"
 	}
 
-	pool, err := postgres.NewPool(context.Background(), dsn)
+	pool, err := postgres.NewPool(context.Background(), dsn, 4)
 	if err != nil {
 		logger.Error("connect in postgres")
 		os.Exit(1)

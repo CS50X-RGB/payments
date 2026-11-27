@@ -52,6 +52,18 @@ func (s *Store) CreateAccount(ctx context.Context, a NewAccount) (Account, error
 	return acc, nil
 }
 
+func (s *Store) Account(ctx context.Context, id uuid.UUID) (Account, error) {
+	acc, err := s.q.GetAccount(ctx, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return Account{}, ErrAccountNotFound
+	}
+
+	if err != nil {
+		return Account{}, fmt.Errorf("got account %s : %w", id, err)
+	}
+	return acc, nil
+}
+
 // Balance returns an account's balance,derived from its entries bt the
 // account_balances view.Accounts are minor units of the account's currency.
 func (s *Store) Balance(ctx context.Context, accountid uuid.UUID) (AccountBalance, error) {
